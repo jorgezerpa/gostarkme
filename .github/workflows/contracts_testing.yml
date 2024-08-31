@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push: 
+    
+jobs: 
+  test-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Check for changes
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            contracts_dir: 
+              - 'contracts/src/**'
+
+      - name: Install scarb
+        if: steps.changes.outputs.contracts_dir == 'true'
+        run: |
+          cd contracts
+          curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh -s -- -v 2.6.5
+
+      - name: Build contracts
+        if: steps.changes.outputs.contracts_dir == 'true'
+        run: |
+          cd contracts
+          echo building contracts
+          scarb build
+          
+      - name: Run tests
+        if: steps.changes.outputs.contracts_dir == 'true'
+        run: |
+          cd contracts
+          echo running tests
+          snforge test
+  
