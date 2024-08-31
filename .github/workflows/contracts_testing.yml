@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push: 
+    
+jobs: 
+  test-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install scarb
+        run: |
+          cd contracts
+          curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh -s -- -v 2.6.5
+      
+      - name: Install snfoundryup and snforge
+        run: |
+          cd contracts
+          curl -L https://raw.githubusercontent.com/foundry-rs/starknet-foundry/master/scripts/install.sh | sh
+          snfoundryup -v 0.20.1
+
+      - name: Build contracts
+        run: |
+          cd contracts
+          echo building contracts
+          scarb build
+          
+      - name: Run tests
+        run: |
+          cd contracts
+          echo running tests
+          snforge test
+  
