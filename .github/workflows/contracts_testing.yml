@@ -9,29 +9,24 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-    #   - name: Check for changes
-    #     uses: dorny/paths-filter@v3
-    #     id: changes
-    #     with:
-    #       filters: |
-    #         contracts_dir: 
-    #           - 'contracts/src/**'
-
       - name: Install scarb
-        # if: steps.changes.outputs.contracts_dir == 'true'
         run: |
           cd contracts
           curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh -s -- -v 2.6.5
+      
+      - name: Install snfoundryup and snforge
+        run: |
+          cd contracts
+          curl -L https://raw.githubusercontent.com/foundry-rs/starknet-foundry/master/scripts/install.sh | sh
+          snfoundryup -v 0.20.1
 
       - name: Build contracts
-        # if: steps.changes.outputs.contracts_dir == 'true'
         run: |
           cd contracts
           echo building contracts
           scarb build
           
       - name: Run tests
-        # if: steps.changes.outputs.contracts_dir == 'true'
         run: |
           cd contracts
           echo running tests
